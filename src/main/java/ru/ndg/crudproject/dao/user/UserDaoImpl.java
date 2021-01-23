@@ -4,12 +4,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+import ru.ndg.crudproject.dao.role.RoleDao;
+import ru.ndg.crudproject.model.Role;
 import ru.ndg.crudproject.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class UserDaoImpl implements UserDao {
@@ -49,7 +52,6 @@ public class UserDaoImpl implements UserDao {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userFromDB.setPassword(user.getPassword());
         }
-//        userFromDB.setRoles(user.getRoles());
         return entityManager.merge(userFromDB);
     }
 

@@ -1,11 +1,6 @@
 package ru.ndg.crudproject.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ndg.crudproject.dao.role.RoleDao;
@@ -16,9 +11,7 @@ import ru.ndg.crudproject.model.Role;
 import ru.ndg.crudproject.model.User;
 import ru.ndg.crudproject.util.SecurityUtil;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,6 +44,9 @@ public class UserServiceRestImpl implements UserRestService {
     @Override
     public UserDto saveUser(UserDto userDto) {
         User user = mapUserDtoToUser(userDto);
+        Set<Role> roles = user.getRoles();
+        Set<Role> persistRoles = roles.stream().map(role -> roleDao.getRoleById(role.getId())).collect(Collectors.toSet());
+        user.setRoles(persistRoles);
         return mapUserToUserDto(userDao.saveUser(user));
     }
 

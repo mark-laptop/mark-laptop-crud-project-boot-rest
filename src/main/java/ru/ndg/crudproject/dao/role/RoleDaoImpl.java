@@ -30,4 +30,9 @@ public class RoleDaoImpl implements RoleDao {
     public Role getRoleById(Long id) {
         return entityManager.find(Role.class, id);
     }
+
+    @Override
+    public Role updateRole(Role role) {
+        return entityManager.merge(role);
+    }
 }

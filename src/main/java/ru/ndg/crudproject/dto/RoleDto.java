@@ -18,5 +18,6 @@ public class RoleDto {
     @NotNull(message = "not be empty")
     private Long id;
 
+    @NotNull(message = "not be empty")
     private String name;
 }

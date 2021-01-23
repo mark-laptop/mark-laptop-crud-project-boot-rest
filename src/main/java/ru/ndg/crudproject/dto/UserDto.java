@@ -40,6 +40,6 @@ public class UserDto {
 
     private Byte age;
 
-    @NotEmpty(groups = {UserCreate.class, UserUpdate.class})
+    @NotEmpty(groups = {UserCreate.class, UserUpdate.class}, message = "not be empty")
     private Set<RoleDto> roles = new HashSet<>();
 }
