@@ -18,79 +18,74 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.ndg.crudproject.service.user.UserService;
 
 @EnableWebSecurity(debug = true)
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Configuration
-    @Order(1)
-    public static class WebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    private UserService userService;
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
 
-        private UserService userService;
-        private AuthenticationSuccessHandler authenticationSuccessHandler;
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
-        @Autowired
-        public void setUserService(UserService userService) {
-            this.userService = userService;
-        }
+    @Autowired
+    public void setAuthenticationSuccessHandler(@Qualifier(value = "simpleLoginSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler) {
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    }
 
-        @Autowired
-        public void setAuthenticationSuccessHandler(@Qualifier(value = "simpleLoginSuccessHandler") AuthenticationSuccessHandler authenticationSuccessHandler) {
-            this.authenticationSuccessHandler = authenticationSuccessHandler;
-        }
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        super.configure(auth);
+        auth.authenticationProvider(authenticationProvider());
+    }
 
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            super.configure(auth);
-            auth.authenticationProvider(authenticationProvider());
-        }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.formLogin()
+                // указываем страницу с формой логина
+                .loginPage("/login")
+                //указываем логику обработки при логине
+                .successHandler(authenticationSuccessHandler)
+                // указываем action с формы логина
+                .loginProcessingUrl("/login")
+                // Указываем параметры логина и пароля с формы логина
+                .usernameParameter("j_username")
+                .passwordParameter("j_password")
+                // даем доступ к форме логина всем
+                .permitAll();
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http.formLogin()
-                    // указываем страницу с формой логина
-                    .loginPage("/login")
-                    //указываем логику обработки при логине
-                    .successHandler(authenticationSuccessHandler)
-                    // указываем action с формы логина
-                    .loginProcessingUrl("/login")
-                    // Указываем параметры логина и пароля с формы логина
-                    .usernameParameter("j_username")
-                    .passwordParameter("j_password")
-                    // даем доступ к форме логина всем
-                    .permitAll();
+        http.logout()
+                // разрешаем делать логаут всем
+                .permitAll()
+                // указываем URL логаута
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                // указываем URL при удачном логауте
+                .logoutSuccessUrl("/login?logout")
+                //выклчаем кроссдоменную секьюрность (на этапе обучения неважна)
+                .and().csrf().disable();
 
-            http.logout()
-                    // разрешаем делать логаут всем
-                    .permitAll()
-                    // указываем URL логаута
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    // указываем URL при удачном логауте
-                    .logoutSuccessUrl("/login?logout")
-                    //выклчаем кроссдоменную секьюрность (на этапе обучения неважна)
-                    .and().csrf().disable();
+        http
+                // делаем страницу регистрации недоступной для авторизированных пользователей
+                .authorizeRequests()
+                //страницы аутентификаци доступна всем
+                .antMatchers("/login").anonymous()
+                // защищенные URL
+                .antMatchers("/user/**").hasAnyRole("ADMIN, USER")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/hello").access("hasAnyRole('ADMIN')").anyRequest().authenticated();
+    }
 
-            http
-                    // делаем страницу регистрации недоступной для авторизированных пользователей
-                    .authorizeRequests()
-                    //страницы аутентификаци доступна всем
-                    .antMatchers("/login").anonymous()
-                    // защищенные URL
-                    .antMatchers("/user/**").hasAnyRole("ADMIN, USER")
-                    .antMatchers("/admin/**").hasRole("ADMIN")
-                    .antMatchers("/hello").access("hasAnyRole('ADMIN')").anyRequest().authenticated();
-        }
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setUserDetailsService(userService);
+        return authenticationProvider;
+    }
 
-        @Bean
-        public DaoAuthenticationProvider authenticationProvider() {
-            DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-            authenticationProvider.setPasswordEncoder(passwordEncoder());
-            authenticationProvider.setUserDetailsService(userService);
-            return authenticationProvider;
-        }
-
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder(12);
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
     }
 
     @Configuration
