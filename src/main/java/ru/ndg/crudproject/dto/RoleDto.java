@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -13,6 +15,7 @@ import lombok.Setter;
 @Builder
 public class RoleDto {
 
+    @NotNull(message = "not be empty")
     private Long id;
 
     private String name;
