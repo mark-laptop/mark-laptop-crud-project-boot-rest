@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ndg.crudproject.dto.UserDto;
+import ru.ndg.crudproject.dto.validate.UserCreate;
+import ru.ndg.crudproject.dto.validate.UserUpdate;
 import ru.ndg.crudproject.service.user.UserRestService;
 
 import java.util.List;
@@ -39,12 +42,12 @@ public class UserRestController {
     }
 
     @PostMapping(value = "/user/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> saveUser(@RequestBody @Validated(value = {UserCreate.class}) UserDto userDto) {
         return new ResponseEntity<>(userRestService.saveUser(userDto), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/user/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@RequestBody @Validated(value = {UserUpdate.class}) UserDto userDto) {
         return new ResponseEntity<>(userRestService.updateUser(userDto), HttpStatus.OK);
     }
 
