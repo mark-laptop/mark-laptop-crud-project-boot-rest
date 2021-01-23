@@ -20,22 +20,22 @@ import java.util.Set;
 @Builder
 public class UserDto {
 
-    @NotNull(groups = {UserUpdate.class})
+    @NotNull(groups = {UserUpdate.class}, message = "not be empty")
     private Long id;
 
-    @NotEmpty(groups = {UserCreate.class, UserUpdate.class})
+    @NotEmpty(groups = {UserCreate.class, UserUpdate.class}, message = "not be empty")
     private String nickname;
 
-    @NotEmpty(groups = {UserCreate.class, UserUpdate.class})
+    @NotEmpty(groups = {UserCreate.class, UserUpdate.class}, message = "not be empty")
     private String firstName;
 
-    @NotEmpty(groups = {UserCreate.class, UserUpdate.class})
+    @NotEmpty(groups = {UserCreate.class, UserUpdate.class}, message = "not be empty")
     private String lastName;
 
-    @NotEmpty(groups = {UserCreate.class, UserUpdate.class})
+    @NotEmpty(groups = {UserCreate.class, UserUpdate.class}, message = "not be empty")
     private String password;
 
-    @NotEmpty(groups = {UserCreate.class, UserUpdate.class})
+    @NotEmpty(groups = {UserCreate.class, UserUpdate.class}, message = "not be empty")
     private String email;
 
     private Byte age;
