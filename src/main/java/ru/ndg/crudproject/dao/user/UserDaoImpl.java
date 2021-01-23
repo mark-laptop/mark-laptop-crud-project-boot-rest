@@ -33,6 +33,7 @@ public class UserDaoImpl implements UserDao {
         return entityManager.find(User.class, id);
     }
 
+    // TODO: 23.01.2021  
     @Override
     public User saveUser(User user) {
         passwordEncoder.encode(user.getPassword());

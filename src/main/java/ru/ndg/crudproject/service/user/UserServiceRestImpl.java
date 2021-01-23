@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ndg.crudproject.dao.role.RoleDao;
@@ -73,19 +74,6 @@ public class UserServiceRestImpl implements UserRestService {
         return mapUserToUserDto(userDao.getUserByUsername(username));
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> optionalUser = Optional.ofNullable(userDao.getUserByUsername(username));
-        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("Not found user by username: " + username));
-        return new org.springframework.security.core.userdetails.User(user.getNickname(),
-                user.getPassword(), getGrantedAuthorityByRoles(user.getRoles()));
-    }
-
-    private Collection<? extends GrantedAuthority> getGrantedAuthorityByRoles(Collection<Role> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());
-    }
-
     private List<UserDto> mapListUserToListUserDto(List<User> users) {
         return users.stream().map(user -> UserDto.builder()
                 .id(user.getId())
@@ -118,6 +106,7 @@ public class UserServiceRestImpl implements UserRestService {
                 .nickname(user.getNickname())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .password(user.getPassword())
                 .age(user.getAge())
                 .email(user.getEmail())
                 .roles(mapSetRoleToSetRoleDto(user.getRoles()))
@@ -130,6 +119,7 @@ public class UserServiceRestImpl implements UserRestService {
                 .nickname(userDto.getNickname())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
+                .password(userDto.getPassword())
                 .age(userDto.getAge())
                 .email(userDto.getEmail())
                 .roles(mapSetRoleDtoToSetRole(userDto.getRoles()))
