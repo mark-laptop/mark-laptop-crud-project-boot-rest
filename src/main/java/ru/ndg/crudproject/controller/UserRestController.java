@@ -21,7 +21,7 @@ import ru.ndg.crudproject.service.user.UserRestService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/")
+@RequestMapping(value = "/api/v1/user/")
 public class UserRestController {
 
     private final UserRestService userRestService;
@@ -31,27 +31,27 @@ public class UserRestController {
         this.userRestService = userRestService;
     }
 
-    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return new ResponseEntity<>(userRestService.getAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(userRestService.getUserById(id), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/user/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> saveUser(@RequestBody @Validated(value = {UserCreate.class}) UserDto userDto) {
         return new ResponseEntity<>(userRestService.saveUser(userDto), HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/user/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> updateUser(@RequestBody @Validated(value = {UserUpdate.class}) UserDto userDto) {
         return new ResponseEntity<>(userRestService.updateUser(userDto), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/user/delete/{id}")
+    @DeleteMapping(value = "/delete/{id}")
     public void deleteUser(@PathVariable(name = "id") Long id) {
         userRestService.deleteUser(id);
     }

@@ -34,7 +34,7 @@
                                 <div class="w-100"></div>
                                 <div class="col p-3 border bg-white text-dark">
 
-                                    <table class="table table-striped">
+                                    <table class="table table-striped" id="table_users">
                                         <thead>
                                         <tr>
                                             <th scope="col">ID</th>
@@ -55,16 +55,16 @@
                                             <td th:text="${user.age}"></td>
                                             <td th:text="${user.email}"></td>
                                             <td>
-                        <span th:each="role : ${user.roles}"
-                              th:text="${role.name.replaceFirst('ROLE_', '') + ' '}">
-                        </span>
+                                                 <span th:each="role : ${user.roles}"
+                                                       th:text="${role.name.replaceFirst('ROLE_', '') + ' '}">
+                                                 </span>
                                             </td>
                                             <td>
-                                                <button class="btn btn-info" data-toggle="modal"
-                                                        data-target="#exampleModal" data-whatever="@mdo"
-                                                        th:attrappend="data-target=${user.id}">Edit
+                                                <button id="edit_modal" class="btn btn-info" data-toggle="modal"
+                                                        data-target="#exampleModal" data-whatever="@mdo">Edit
                                                 </button>
-                                                <div class="modal fade" id="exampleModal" th:attrappend="id=${user.id}"
+                                                <div class="modal fade" id="edit_modal_table"
+                                                     th:attrappend="id=${user.id}"
                                                      tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                                                      aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -78,7 +78,7 @@
                                                                 </button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <form th:method="POST" th:action="@{/admin/update}" onclick="fetch()">
+                                                                <form th:method="POST" th:action="@{/admin/update}">
                                                                     <div class="form-group">
                                                                         <label for="id"
                                                                                class="col-form-label">ID</label>
@@ -261,24 +261,12 @@
 <script th:replace="fragments/footer.html :: scripts"/>
 
 <script type="text/javascript">
-    fetch('http://localhost:8088/api/v1/users')
-        .then(
-            function(response) {
-                if (response.status !== 200) {
-                    console.log('Looks like there was a problem. Status Code: ' +
-                        response.status);
-                    return;
-                }
-
-                // Examine the text in the response
-                response.json().then(function(data) {
-                    console.log(data);
-                    // $('#id').val(data.id)
-                });
-            }
-        )
-        .catch(function(err) {
-            console.log('Fetch Error :-S', err);
+    fetch('http://localhost:8088/api/v1/users/1')
+        .then(function (response) {
+            return response.json()
+        })
+        .then(function (json) {
+            console.log(json);
         });
 </script>
 

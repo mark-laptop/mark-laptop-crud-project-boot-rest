@@ -14,7 +14,7 @@ import ru.ndg.crudproject.service.role.RoleRestService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/")
+@RequestMapping(value = "/api/v1/roles")
 public class RoleRestController {
 
     private final RoleRestService roleRestService;
@@ -24,12 +24,12 @@ public class RoleRestController {
         this.roleRestService = roleRestService;
     }
 
-    @GetMapping(value = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<RoleDto>> getAllRoles() {
         return new ResponseEntity<>(roleRestService.getAllRoles(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/roles/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RoleDto> getRoleById(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(roleRestService.getRoleById(id), HttpStatus.OK);
     }
