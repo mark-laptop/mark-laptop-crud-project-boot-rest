@@ -5,7 +5,6 @@
 
 <body>
 
-
 <nav th:replace="fragments/header.html :: nav"></nav>
 
 <div class="container-fluid h-100">
@@ -46,6 +45,8 @@
                                             <th scope="col">Roles</th>
                                             <th scope="col">Edit</th>
                                             <th scope="col">Delete</th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody class="user_data">
@@ -94,29 +95,69 @@
 <script type="text/javascript">
     function editClick(id) {
         $(document).ready(function () {
+            var roles;
+            fetch('http://localhost:8088/api/v1/roles/')
+                .then(function (response) {
+                    return response.json()
+                })
+                .then(function (json) {
+                    roles = json;
+                    fetch('http://localhost:8088/api/v1/users/' + id)
+                        .then(function (response) {
+                            return response.json()
+                        })
+                        .then(function (json) {
+                            $('#id_edit').val(json.id);
+                            $('#nickname_edit').val(json.nickname);
+                            $('#first_name_edit').val(json.firstName);
+                            $('#last_name_edit').val(json.lastName);
+                            $('#email_edit').val(json.email);
+                            $('#age_edit').val(json.age);
+                            $('#password_edit').val(json.password);
+                            var select = document.getElementById('roles_edit');
 
+                            for (key in roles) {
+                                var el = document.createElement('option');
+                                el.text = roles[key].name.replace('ROLE_', '');
+                                el.value = roles[key].id;
+                                for (key_role in json.roles) {
+                                    if (roles[key].name === json.roles[key_role].name) {
+                                        el.selected = true;
+                                    }
+                                }
+                                select.add(el);
+                            }
+                            $('#edit_modal').modal();
+                        });
+                });
+        });
+    }
+</script>
 
-        fetch('http://localhost:8088/api/v1/users/' + id)
-            .then(function (response) {
-                return response.json()
+<script type="text/javascript">
+    function editUser() {
+        $(document).ready(function () {
+            fetch('http://localhost:8088/api/v1/users/update', {
+                method: 'PUT',
+                headers: new Headers({
+                    'Content-Type': 'application/json;charset=utf-8'
+                }),
+                body: JSON.stringify({
+                    id: $('#id_edit').val(),
+                    nickname: $('#nickname_edit').val(),
+                    firstName: $('#first_name_edit').val(),
+                    lastName: $('#last_name_edit').val(),
+                    age: $('#age_edit').val(),
+                    email: $('#email_edit').val(),
+                    password: $('#password_edit').val()
+                    // roles: JSON.stringify($('#roles_edit').val())
+                })
             })
-            .then(function (json) {
-                $('#id_edit').val(json.id);
-                $('#nickname_edit').val(json.nickname);
-                $('#first_name_edit').val(json.firstName);
-                $('#last_name_edit').val(json.lastName);
-                $('#email_edit').val(json.email);
-                $('#age_edit').val(json.age);
-                $('#password_edit').val(json.password);
-                var select = document.getElementById('roles_edit');
-                for (key in json.roles) {
-                    var el = document.createElement('option');
-                    el.text = json.roles[key].name.replace('ROLE_', '');
-                    el.value = json.roles[key].id;
-                    select.add(el);
-                }
-                $('#edit_modal').modal();
-            });
+                .then(function (response) {
+                    return response.json()
+                })
+                .then(function (json) {
+                })
         });
     }
 </script>
@@ -124,6 +165,7 @@
 <script type="text/javascript">
     function deleteClick(id) {
         $(document).ready(function () {
+
             fetch('http://localhost:8088/api/v1/users/' + id)
                 .then(function (response) {
                     return response.json()
@@ -149,6 +191,17 @@
     }
 </script>
 
+<script type="text/javascript">
+    function deleteUser() {
+        $(document).ready(function () {
+            fetch('http://localhost:8088/api/v1/users/delete/' + $('#id_delete').val(), {method: 'DELETE'})
+                .then(function (response) {
+                    console.log(response)
+                })
+        });
+    }
+</script>
+
 <div class="modal fade" id="edit_modal"
      tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
@@ -163,10 +216,10 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST">
+                <form id="form_edit">
                     <div class="form-group">
                         <label for="id_edit" class="col-form-label">ID</label>
-                        <input th:readonly="true" id="id_edit" path="id" type="text" class="form-control" name="id">
+                        <input id="id_edit" path="id" type="text" class="form-control" name="id">
                     </div>
                     <div class="form-group">
                         <label for="nickname_edit" class="col-form-label">Nickname</label>
@@ -199,7 +252,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-info">Edit</button>
+                        <button type="submit" class="btn btn-info" onclick="editUser()">Edit</button>
                     </div>
                 </form>
             </div>
@@ -220,7 +273,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post">
+                <form>
                     <div class="form-group">
                         <label for="id_delete" class="col-form-label">ID</label>
                         <input readonly id="id_delete" path="id" type="text" class="form-control" name="id">
@@ -255,12 +308,8 @@
                         </select>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                                data-dismiss="modal">Close
-                        </button>
-                        <button type="submit" class="btn btn-danger">
-                            Delete
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger" onclick="deleteUser()">Delete</button>
                     </div>
                 </form>
             </div>

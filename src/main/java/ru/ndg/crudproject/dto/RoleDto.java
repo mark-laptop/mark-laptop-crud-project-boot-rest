@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,4 +21,19 @@ public class RoleDto {
 
     @NotNull(message = "not be empty")
     private String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RoleDto roleDto = (RoleDto) o;
+
+        return Objects.equals(name, roleDto.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.name);
+    }
 }

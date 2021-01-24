@@ -88,29 +88,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(12);
     }
 
-    @Configuration
-    @Order(2)
-    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                    .antMatcher("/api/v1/**")
-                    .authorizeRequests()
-                    .anyRequest()
-                    .hasAnyRole("ADMIN", "USER")
-                    .and()
-                    .httpBasic()
-//                    .authenticationEntryPoint((req, resp, exception) -> {
-//                        resp.setContentType("application/json");
-//                        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//                        resp.setCharacterEncoding("UTF-8");
-//                        resp.getWriter().println("{ \"error\": \"" + exception.getMessage() + "\" }");
-//                    })
-                    .and()
-                    .csrf().disable()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        }
-    }
+//    @Configuration
+//    @Order(2)
+//    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+//
+//        @Override
+//        protected void configure(HttpSecurity http) throws Exception {
+//            http
+//                    .antMatcher("/api/v1/**")
+//                    .authorizeRequests()
+//                    .anyRequest()
+//                    .hasAnyRole("ADMIN", "USER")
+//                    .and()
+//                    .httpBasic()
+//                    .and()
+//                    .csrf().disable()
+//                    .sessionManagement()
+//                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//        }
+//    }
 }

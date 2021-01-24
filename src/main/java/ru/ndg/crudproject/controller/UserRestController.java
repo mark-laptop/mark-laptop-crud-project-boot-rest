@@ -47,7 +47,7 @@ public class UserRestController {
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> updateUser(@RequestBody @Validated(value = {UserUpdate.class}) UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@RequestBody /*@Validated(value = {UserUpdate.class})*/ UserDto userDto) {
         return new ResponseEntity<>(userRestService.updateUser(userDto), HttpStatus.OK);
     }
 
