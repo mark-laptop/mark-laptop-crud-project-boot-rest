@@ -21,7 +21,7 @@ import ru.ndg.crudproject.service.user.UserRestService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/user/")
+@RequestMapping(value = "/api/v1/users")
 public class UserRestController {
 
     private final UserRestService userRestService;
