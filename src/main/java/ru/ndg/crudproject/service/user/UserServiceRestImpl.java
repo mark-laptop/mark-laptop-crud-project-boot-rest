@@ -53,7 +53,11 @@ public class UserServiceRestImpl implements UserRestService {
     @Transactional
     @Override
     public UserDto updateUser(UserDto userDto) {
-        User updateUser = userDao.updateUser(mapUserDtoToUser(userDto));
+        User updateUser = mapUserDtoToUser(userDto);
+        Set<Role> roles = updateUser.getRoles();
+        Set<Role> persistRoles = roles.stream().map(role -> roleDao.getRoleById(role.getId())).collect(Collectors.toSet());
+        updateUser.setRoles(persistRoles);
+        updateUser = userDao.updateUser(updateUser);
         SecurityUtil.refreshRolesForAuthenticatedUser(updateUser);
         return mapUserToUserDto(updateUser);
     }

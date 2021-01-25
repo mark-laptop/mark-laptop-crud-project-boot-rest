@@ -29,11 +29,14 @@ public class RoleDto {
 
         RoleDto roleDto = (RoleDto) o;
 
+        if (!Objects.equals(id, roleDto.id)) return false;
         return Objects.equals(name, roleDto.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.name);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 }

@@ -23,7 +23,7 @@
                         </div>
                         <div class="w-100"></div>
                         <div class="col p-3 border bg-white text-dark">
-                            <table class="table table-striped text-center">
+                            <table class="table table-striped text-center" id="userTable">
                                 <thead>
                                 <tr>
                                     <th scope="col">ID</th>
@@ -35,18 +35,6 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="user, iterStat : ${user}"
-                                    th:style="${iterStat.odd}? 'font-weight: bold;'">
-                                    <th scope="row" th:text="${user.id}"></th>
-                                    <td th:text="${user.firstName}"></td>
-                                    <td th:text="${user.lastName}"></td>
-                                    <td th:text="${user.age}"></td>
-                                    <td th:text="${user.email}"></td>
-                                    <td>
-                                    <span th:each="role : ${user.roles}"
-                                          th:text="${role.name.replace('ROLE_', '') + ' '}"></span>
-                                    </td>
-                                </tr>
                                 </tbody>
                             </table>
                         </div>

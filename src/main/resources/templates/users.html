@@ -34,7 +34,7 @@
                                 <div class="w-100"></div>
                                 <div class="col p-3 border bg-white text-dark">
 
-                                    <table class="table table-striped" id="table_users">
+                                    <table class="table table-striped" id="userTable">
                                         <thead>
                                         <tr>
                                             <th scope="col">ID</th>
@@ -45,12 +45,9 @@
                                             <th scope="col">Roles</th>
                                             <th scope="col">Edit</th>
                                             <th scope="col">Delete</th>
-                                            <th></th>
-                                            <th></th>
                                         </tr>
                                         </thead>
-                                        <tbody class="user_data">
-
+                                        <tbody>
                                         </tbody>
                                     </table>
                                 </div>
@@ -63,259 +60,10 @@
     </div>
 </div>
 
-
-<script th:replace="fragments/footer.html :: scripts"/>
-
-<script type="text/javascript">
-    fetch('http://localhost:8088/api/v1/users')
-        .then(function (response) {
-            return response.json()
-        })
-        .then(function (json) {
-            var list = document.querySelector('.user_data');
-            for (key in json) {
-                var roles = '';
-                for (key_inner in json[key].roles) {
-                    roles += json[key].roles[key_inner].name.replace('ROLE_', '') + ' ';
-                }
-                list.innerHTML +=
-                    '<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">' +
-                    '<tr ><th>' + json[key].id + '</th>' +
-                    '<th>' + json[key].firstName + '</th>' +
-                    '<th>' + json[key].lastName + '</th>' +
-                    '<th>' + json[key].age + '</th>' +
-                    '<th>' + json[key].email + '</th>' +
-                    '<th>' + roles + '</th>' +
-                    '<td><button class="btn btn-info" data-toggle="modal" data-target="#edit_modal" onclick="editClick(' + json[key].id + ')">Edit</button></td>' +
-                    '<td><button class="btn btn-danger" data-toggle="modal" data-target="#delete_modal" onclick="deleteClick(' + json[key].id + ')">Delete</button></td></tr>';
-            }
-        });
-</script>
-
-<script type="text/javascript">
-    function editClick(id) {
-        $(document).ready(function () {
-            var roles;
-            fetch('http://localhost:8088/api/v1/roles/')
-                .then(function (response) {
-                    return response.json()
-                })
-                .then(function (json) {
-                    roles = json;
-                    fetch('http://localhost:8088/api/v1/users/' + id)
-                        .then(function (response) {
-                            return response.json()
-                        })
-                        .then(function (json) {
-                            $('#id_edit').val(json.id);
-                            $('#nickname_edit').val(json.nickname);
-                            $('#first_name_edit').val(json.firstName);
-                            $('#last_name_edit').val(json.lastName);
-                            $('#email_edit').val(json.email);
-                            $('#age_edit').val(json.age);
-                            $('#password_edit').val(json.password);
-                            var select = document.getElementById('roles_edit');
-
-                            for (key in roles) {
-                                var el = document.createElement('option');
-                                el.text = roles[key].name.replace('ROLE_', '');
-                                el.value = roles[key].id;
-                                for (key_role in json.roles) {
-                                    if (roles[key].name === json.roles[key_role].name) {
-                                        el.selected = true;
-                                    }
-                                }
-                                select.add(el);
-                            }
-                            $('#edit_modal').modal();
-                        });
-                });
-        });
-    }
-</script>
-
-<script type="text/javascript">
-    function editUser() {
-        $(document).ready(function () {
-            fetch('http://localhost:8088/api/v1/users/update', {
-                method: 'PUT',
-                headers: new Headers({
-                    'Content-Type': 'application/json;charset=utf-8'
-                }),
-                body: JSON.stringify({
-                    id: $('#id_edit').val(),
-                    nickname: $('#nickname_edit').val(),
-                    firstName: $('#first_name_edit').val(),
-                    lastName: $('#last_name_edit').val(),
-                    age: $('#age_edit').val(),
-                    email: $('#email_edit').val(),
-                    password: $('#password_edit').val()
-                    // roles: JSON.stringify($('#roles_edit').val())
-                })
-            })
-                .then(function (response) {
-                    return response.json()
-                })
-                .then(function (json) {
-                })
-        });
-    }
-</script>
-
-<script type="text/javascript">
-    function deleteClick(id) {
-        $(document).ready(function () {
-
-            fetch('http://localhost:8088/api/v1/users/' + id)
-                .then(function (response) {
-                    return response.json()
-                })
-                .then(function (json) {
-                    $('#id_delete').val(json.id);
-                    $('#nickname_delete').val(json.nickname);
-                    $('#first_name_delete').val(json.firstName);
-                    $('#last_name_delete').val(json.lastName);
-                    $('#email_delete').val(json.email);
-                    $('#age_delete').val(json.age);
-                    $('#password_delete').val(json.password);
-                    var select = document.getElementById('roles_delete');
-                    for (key in json.roles) {
-                        var el = document.createElement('option');
-                        el.text = json.roles[key].name.replace('ROLE_', '');
-                        el.value = json.roles[key].id;
-                        select.add(el);
-                    }
-                    $('#delete_modal').modal();
-                });
-        });
-    }
-</script>
-
-<script type="text/javascript">
-    function deleteUser() {
-        $(document).ready(function () {
-            fetch('http://localhost:8088/api/v1/users/delete/' + $('#id_delete').val(), {method: 'DELETE'})
-                .then(function (response) {
-                    console.log(response)
-                })
-        });
-    }
-</script>
-
-<div class="modal fade" id="edit_modal"
-     tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Update
-                    user</h5>
-                <button type="button" class="close" data-dismiss="modal"
-                        aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="form_edit">
-                    <div class="form-group">
-                        <label for="id_edit" class="col-form-label">ID</label>
-                        <input id="id_edit" path="id" type="text" class="form-control" name="id">
-                    </div>
-                    <div class="form-group">
-                        <label for="nickname_edit" class="col-form-label">Nickname</label>
-                        <input id="nickname_edit" path="nickname" type="text" class="form-control" name="nickname">
-                    </div>
-                    <div class="form-group">
-                        <label for="first_name_edit" class="col-form-label">Username</label>
-                        <input id="first_name_edit" path="firstName" type="text" class="form-control" name="firstName">
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name_edit" class="col-form-label">Username</label>
-                        <input id="last_name_edit" path="lastName" type="text" class="form-control" name="lastName">
-                    </div>
-                    <div class="form-group">
-                        <label for="age_edit" class="col-form-label">Age</label>
-                        <input id="age_edit" path="age" type="number" class="form-control" name="age">
-                    </div>
-                    <div class="form-group">
-                        <label for="password_edit" class="col-form-label">Password</label>
-                        <input type="password" id="password_edit" path="password" class="form-control" name="password">
-                    </div>
-                    <div class="form-group">
-                        <label for="email_edit" class="col-form-label">Email</label>
-                        <input type="email" id="email_edit" path="email" class="form-control" name="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="roles_edit" class="col-form-label">Roles</label>
-                        <select path="roles" name="roles" multiple class="form-control" id="roles_edit" required>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-info" onclick="editUser()">Edit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="delete_modal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Update
-                    user</h5>
-                <button type="button" class="close" data-dismiss="modal"
-                        aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="id_delete" class="col-form-label">ID</label>
-                        <input readonly id="id_delete" path="id" type="text" class="form-control" name="id">
-                    </div>
-                    <div class="form-group">
-                        <label for="nickname_delete" class="col-form-label">Nickname</label>
-                        <input readonly id="nickname_delete" path="nickname" type="text" class="form-control"
-                               name="nickname">
-                    </div>
-                    <div class="form-group">
-                        <label for="first_name_delete" class="col-form-label">Username</label>
-                        <input readonly id="first_name_delete" path="firstName" type="text" class="form-control"
-                               name="firstName">
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name_delete" class="col-form-label">Username</label>
-                        <input readonly id="last_name_delete" path="lastName" type="text" class="form-control"
-                               name="lastName">
-                    </div>
-                    <div class="form-group">
-                        <label for="age_delete" class="col-form-label">Age</label>
-                        <input readonly type="number" id="age_delete" path="age" class="form-control" name="age">
-                    </div>
-                    <div class="form-group">
-                        <label for="email_delete" class="col-form-label">Email</label>
-                        <input readonly type="email" id="email_delete" path="email" class="form-control" name="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="roles_delete" class="col-form-label">Roles</label>
-                        <select readonly path="roles" name="roles" multiple class="form-control" id="roles_delete"
-                                required>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger" onclick="deleteUser()">Delete</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<div th:replace="fragments/modal :: defaultModal"></div>
+<div th:replace="fragments/form :: userForm"></div>
+<div th:replace="fragments/table :: viewUserTable"></div>
+<div th:replace="fragments/footer :: script"></div>
 
 </body>
 </html>

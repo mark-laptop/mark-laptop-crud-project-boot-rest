@@ -52,7 +52,7 @@ public class UserDaoImpl implements UserDao {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userFromDB.setPassword(user.getPassword());
         }
-        return entityManager.merge(userFromDB);
+        return userFromDB;
     }
 
     @Override

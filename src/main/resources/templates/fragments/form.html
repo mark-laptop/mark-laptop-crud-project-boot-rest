@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<form class="bookForm" th:fragment="userForm" style="display:none;">
+    <div class="form-group">
+        <label for="id">ID</label>
+        <input type="text" class="form-control" id="id" name="id" placeholder="ID">
+        <div class="invalid-feedback"></div>
+    </div>
+    <div class="form-group">
+        <label for="nickname">Nickname</label>
+        <input type="text" class="form-control" id="nickname" name="nickname" placeholder="Nickname">
+    </div>
+    <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
+    </div>
+    <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
+    </div>
+    <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" class="form-control" id="age" name="age" placeholder="Age">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+    </div>
+    <div class="form-group">
+        <label for="roles">Roles</label>
+        <select multiple class="form-control" id="roles" name="roles" required>
+        </select>
+    </div>
+</form>
+</html>
