@@ -87,24 +87,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-
-//    @Configuration
-//    @Order(2)
-//    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-//
-//        @Override
-//        protected void configure(HttpSecurity http) throws Exception {
-//            http
-//                    .antMatcher("/api/v1/**")
-//                    .authorizeRequests()
-//                    .anyRequest()
-//                    .hasAnyRole("ADMIN", "USER")
-//                    .and()
-//                    .httpBasic()
-//                    .and()
-//                    .csrf().disable()
-//                    .sessionManagement()
-//                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        }
-//    }
 }
