@@ -8,21 +8,21 @@ let primaryButton = $('<button type="button" class="btn btn-primary"></button>')
 let dismissButton = $('<button type="button" class="btn btn-secondary" data-dismiss="modal"></button>');
 let dangerButton = $('<button type="button" class="btn btn-danger"></button>');
 
-$(document).ready(function(){
+$(document).ready(function () {
     viewAllUsers();
     defaultModal();
 });
 
 function defaultModal() {
     modal.modal({
-            keyboard: true,
-            backdrop: "static",
-            show: false,
-    }).on("show.bs.modal", function(event){
+        keyboard: true,
+        backdrop: "static",
+        show: false,
+    }).on("show.bs.modal", function (event) {
         let button = $(event.relatedTarget);
         let id = button.data('id');
         let action = button.data('action');
-        switch(action) {
+        switch (action) {
             case 'addUser':
                 addUser($(this));
                 break;
@@ -35,7 +35,7 @@ function defaultModal() {
                 deleteUser($(this), id);
                 break;
         }
-    }).on('hidden.bs.modal', function(event){
+    }).on('hidden.bs.modal', function (event) {
         $(this).find('.modal-title').html('');
         $(this).find('.modal-body').html('');
         $(this).find('.modal-footer').html('');
@@ -45,25 +45,29 @@ function defaultModal() {
 async function viewAllUsers() {
     $('#userTable tbody').empty();
     const usersResponse = await userService.findAll();
+    const rolesResponse = await roleService.findAll();
     const usersJson = usersResponse.json();
-    usersJson.then(users => {
-        users.forEach(user => {
-            let userRow = `$(<tr>
+    const rolesJson = rolesResponse.json();
+    let roleRow = '';
+    rolesJson.then(roles => {
+        roles.forEach(role => {
+            roleRow += role.name.replace('ROLE_', '') + ' ';
+        });
+        console.log(roleRow);
+        usersJson.then(users => {
+            users.forEach(user => {
+                let userRow = `$(<tr>
                         <th scope="row">${user.id}</th>
-                        <td>${user.nickname}</td>
                         <td>${user.firstName}</td>
                         <td>${user.lastName}</td>
                         <td>${user.age}</td>
                         <td>${user.email}</td>
-                        <td>${user.roles.name}</td>
-                        <td class="text-center">
-                            <div class="btn-group" role="group" aria-label="Action Buttons">
-                                <button class="btn btn-success btn-sm" data-id="${user.id}" data-action="editUser" data-toggle="modal" data-target="#defaultModal"><i class="far fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" data-id="${user.id}" data-action="deleteUser" data-toggle="modal" data-target="#defaultModal"><i class="far fa-trash-alt"></i></button>
-                            </div>
-                        </td>
+                        <td>${roleRow}</td>
+                        <td><button class="btn btn-info" data-id="${user.id}" data-action="editUser" data-toggle="modal" data-target="#defaultModal">Edit</button></td>
+                        <td><button class="btn btn-danger" data-id="${user.id}" data-action="deleteUser" data-toggle="modal" data-target="#defaultModal">Delete</button></td>
                     </tr>)`;
-            $('#userTable tbody').append(userRow);
+                $('#userTable tbody').append(userRow);
+            });
         });
     });
 }
@@ -89,7 +93,7 @@ async function addUser(modal) {
         });
     });
 
-    $('#saveUserButton').click(async function(e){
+    $('#saveUserButton').click(async function (e) {
         let id = userForm.find('#id').val().trim();
         let nickname = userForm.find('#nickname').val().trim();
         let firstName = userForm.find('#firstName').val().trim();
@@ -122,7 +126,7 @@ async function addUser(modal) {
             $('#defaultModal').modal('show');
         } else if (userResponse.status == 400) {
             userResponse.json().then(response => {
-                response.validationErrors.forEach(function(error){
+                response.validationErrors.forEach(function (error) {
                     modal.find('#' + error.field).addClass('is-invalid');
                     modal.find('#' + error.field).next('.invalid-feedback').text(error.message);
                 });
@@ -135,8 +139,8 @@ async function addUser(modal) {
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>`;
-                 modal.find('.modal-body').prepend(alert);
-             });
+                modal.find('.modal-body').prepend(alert);
+            });
         }
     });
 }
@@ -185,7 +189,7 @@ async function editUser(modal, id) {
     });
 
 
-    $('#updateUserButton').click(async function(e){
+    $('#updateUserButton').click(async function (e) {
         let id = userForm.find('#id').val().trim();
         let nickname = userForm.find('#nickname').val().trim();
         let firstName = userForm.find('#firstName').val().trim();
@@ -218,7 +222,7 @@ async function editUser(modal, id) {
             $('#defaultModal').modal('show');
         } else if (userResponse.status == 400) {
             userResponse.json().then(response => {
-                response.validationErrors.forEach(function(error){
+                response.validationErrors.forEach(function (error) {
                     modal.find('#' + error.field).addClass('is-invalid');
                     modal.find('#' + error.field).next('.invalid-feedback').text(error.message);
                 });
@@ -231,8 +235,8 @@ async function editUser(modal, id) {
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>`;
-                 modal.find('.modal-body').prepend(alert);
-             });
+                modal.find('.modal-body').prepend(alert);
+            });
         }
     });
 }
@@ -265,32 +269,32 @@ async function deleteUser(modal, id) {
         modal.find('#roles').html(user.roles.name);
     });
 
-    $('#deleteUserButton').click(async function(e){
-            const userResponse = await userService.delete(id);
+    $('#deleteUserButton').click(async function (e) {
+        const userResponse = await userService.delete(id);
 
-            if (userResponse.status == 204) {
-                viewAllUsers();
-                modal.find('.modal-title').html('Success');
-                modal.find('.modal-body').html('User deleted!');
-                dismissButton.html('Close');
-                modal.find(modalFooter).html(dismissButton);
-                $('#defaultModal').modal('show');
-            } else {
-                userResponse.json().then(response => {
-                    let alert = `<div class="alert alert-success alert-dismissible fade show col-12" role="alert">
+        if (userResponse.status == 204) {
+            viewAllUsers();
+            modal.find('.modal-title').html('Success');
+            modal.find('.modal-body').html('User deleted!');
+            dismissButton.html('Close');
+            modal.find(modalFooter).html(dismissButton);
+            $('#defaultModal').modal('show');
+        } else {
+            userResponse.json().then(response => {
+                let alert = `<div class="alert alert-success alert-dismissible fade show col-12" role="alert">
                             ${response.error}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>`;
-                     modal.find('.modal-body').prepend(alert);
-                 });
-            }
-        });
+                modal.find('.modal-body').prepend(alert);
+            });
+        }
+    });
 }
 
 const http = {
-    fetch: async function(url, options = {}) {
+    fetch: async function (url, options = {}) {
         const response = await fetch(url, {
             headers: {
                 'Accept': 'application/json',
@@ -327,4 +331,10 @@ const userService = {
             method: 'DELETE'
         });
     },
+};
+
+const roleService = {
+    findAll: async () => {
+        return await http.fetch('/api/v1/roles');
+    }
 };
