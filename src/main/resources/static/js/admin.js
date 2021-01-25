@@ -50,7 +50,8 @@ async function viewAllUsers() {
             let roleRow = '';
             user.roles.forEach(role => {
                 roleRow += role.name.replace('ROLE_', '') + ' ';
-                let userRow = `$(<tr>
+            });
+            let userRow = `$(<tr>
                         <th scope="row">${user.id}</th>
                         <td>${user.firstName}</td>
                         <td>${user.lastName}</td>
@@ -60,8 +61,7 @@ async function viewAllUsers() {
                         <td><button class="btn btn-info" data-id="${user.id}" data-action="editUser" data-toggle="modal" data-target="#defaultModal">Edit</button></td>
                         <td><button class="btn btn-danger" data-id="${user.id}" data-action="deleteUser" data-toggle="modal" data-target="#defaultModal">Delete</button></td>
                     </tr>)`;
-                $('#userTable tbody').append(userRow);
-            });
+            $('#userTable tbody').append(userRow);
         });
     });
 }
