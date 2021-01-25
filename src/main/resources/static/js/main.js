@@ -45,17 +45,12 @@ function defaultModal() {
 async function viewAllUsers() {
     $('#userTable tbody').empty();
     const usersResponse = await userService.findAll();
-    const rolesResponse = await roleService.findAll();
     const usersJson = usersResponse.json();
-    const rolesJson = rolesResponse.json();
-    let roleRow = '';
-    rolesJson.then(roles => {
-        roles.forEach(role => {
-            roleRow += role.name.replace('ROLE_', '') + ' ';
-        });
-        console.log(roleRow);
-        usersJson.then(users => {
-            users.forEach(user => {
+    usersJson.then(users => {
+        users.forEach(user => {
+            let roleRow = '';
+            user.roles.forEach(role => {
+                roleRow += role.name.replace('ROLE_', '') + ' ';
                 let userRow = `$(<tr>
                         <th scope="row">${user.id}</th>
                         <td>${user.firstName}</td>
@@ -148,7 +143,7 @@ async function addUser(modal) {
 async function editUser(modal, id) {
     const userResponse = await userService.findById(id);
     const userJson = userResponse.json();
-    const rolesResponse = await rolesService.findAll();
+    const rolesResponse = await roleService.findAll();
     const rolesJson = rolesResponse.json();
 
     let idInput = `<div class="form-group">
@@ -164,26 +159,32 @@ async function editUser(modal, id) {
     userForm.prop('id', 'updateUserForm');
     modal.find(userForm).prepend(idInput);
     modal.find(userForm).show();
-    dismissButton.html('Cancel');
+    dismissButton.html('Close');
     modal.find(modalFooter).append(dismissButton);
     primaryButton.prop('id', 'updateUserButton');
-    primaryButton.html('Update');
+    primaryButton.html('Edit');
     modal.find(modalFooter).append(primaryButton);
 
-    userJson.then(book => {
-        modal.find('#id').val(book.id);
-        modal.find('#nickname').val(book.nickname);
-        modal.find('#firstName').val(book.firstName);
-        modal.find('#lastName').val(book.lastName);
-        modal.find('#age').val(book.age);
-        modal.find('#password').val(book.password);
-        modal.find('#email').val(book.email);
+    userJson.then(user => {
+        modal.find('#id').val(user.id);
+        modal.find('#nickname').val(user.nickname);
+        modal.find('#firstName').val(user.firstName);
+        modal.find('#lastName').val(user.lastName);
+        modal.find('#age').val(user.age);
+        modal.find('#email').val(user.email);
+        modal.find('#password').val(user.password);
         rolesJson.then(roles => {
             roles.forEach(role => {
-                if (book.role.id == role.id)
-                    modal.find('#roles').append(new Option(role.name, role.id, false, true));
+                let flag = false;
+                user.roles.forEach(roleUser => {
+                    if (roleUser.id == role.id) {
+                        flag = true;
+                    }
+                });
+                if (flag)
+                    modal.find('#roles').append(new Option(role.name.replace('ROLE_', ''), role.id, false, true));
                 else
-                    modal.find('#roles').append(new Option(role.name, role.id));
+                    modal.find('#roles').append(new Option(role.name.replace('ROLE_', ''), role.id));
             });
         });
     });
@@ -197,7 +198,7 @@ async function editUser(modal, id) {
         let age = userForm.find('#age').val().trim();
         let password = userForm.find('#password').val().trim();
         let email = userForm.find('#email').val().trim();
-        let roleId = userForm.find('#role option:selected').val().trim();
+        let roleId = userForm.find('#roles option:selected').val().trim();
         let data = {
             id: id,
             nickname: nickname,
@@ -206,9 +207,9 @@ async function editUser(modal, id) {
             age: age,
             password: password,
             email: email,
-            roles: {
-                id: roleId
-            }
+            roles: [
+                {id: roleId}
+            ]
         };
 
         const userResponse = await userService.update(id, data);
@@ -245,13 +246,21 @@ async function deleteUser(modal, id) {
     const userResponse = await userService.findById(id);
     const userJson = userResponse.json();
 
+    let idInput = `<div class="form-group">
+            <label for="id">ID</label>
+            <input type="text" class="form-control" id="id" name="id" disabled>
+            <div class="invalid-feedback"></div>
+        </div>`;
+
     modal.find(modalTitle).html('Delete User');
-    let message = '<strong>Are you sure to delete the following book?</strong>';
+    let message = '<strong>Are you sure to delete the following user?</strong>';
     modal.find(modalBody).html(message);
-    let viewUserTableHidden = $('.viewUserTable:hidden')[0];
-    modal.find(modalBody).append($(viewUserTableHidden).clone());
-    let viewUserTable = modal.find('.viewUserTable');
-    modal.find(viewUserTable).show();
+    let userFormHidden = $('.userForm:hidden')[0];
+    modal.find(modalBody).append($(userFormHidden).clone());
+    let userForm = modal.find('.userForm');
+    userForm.prop('id', 'updateUserForm');
+    modal.find(userForm).prepend(idInput);
+    modal.find(userForm).show();
     dismissButton.html('Close');
     modal.find(modalFooter).append(dismissButton);
     dangerButton.prop('id', 'deleteUserButton');
@@ -259,14 +268,16 @@ async function deleteUser(modal, id) {
     modal.find(modalFooter).append(dangerButton);
 
     userJson.then(user => {
-        modal.find('#id').html(user.id);
-        modal.find('#nickname').html(user.nickname);
-        modal.find('#firstName').html(user.firstName);
-        modal.find('#lastName').html(user.lastName);
-        modal.find('#age').html(user.age);
-        modal.find('#password').html(user.password);
-        modal.find('#email').html(user.email);
-        modal.find('#roles').html(user.roles.name);
+        modal.find('#id').val(user.id);
+        modal.find('#nickname').val(user.nickname);
+        modal.find('#firstName').val(user.firstName);
+        modal.find('#lastName').val(user.lastName);
+        modal.find('#age').val(user.age);
+        modal.find('#password').val(user.password);
+        modal.find('#email').val(user.email);
+        user.roles.forEach(roleUser => {
+            modal.find('#roles').append(new Option(roleUser.name.replace('ROLE_', ''), roleUser.id));
+        });
     });
 
     $('#deleteUserButton').click(async function (e) {
@@ -321,7 +332,7 @@ const userService = {
         return await http.fetch('/api/v1/users/' + id);
     },
     update: async (id, data) => {
-        return await http.fetch('/api/v1/users/update/' + id, {
+        return await http.fetch('/api/v1/users/update', {
             method: 'PUT',
             body: JSON.stringify(data)
         });

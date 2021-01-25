@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ndg.crudproject.dto.UserDto;
 import ru.ndg.crudproject.dto.validate.UserCreate;
@@ -52,6 +53,7 @@ public class UserRestController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable(name = "id") Long id) {
         userRestService.deleteUser(id);
     }
