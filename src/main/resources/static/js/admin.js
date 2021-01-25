@@ -22,10 +22,6 @@ function defaultModal() {
         let id = button.data('id');
         let action = button.data('action');
         switch (action) {
-            case 'addUser':
-                addUser($(this));
-                break;
-
             case 'editUser':
                 editUser($(this), id);
                 break;
@@ -125,9 +121,7 @@ async function editUser(modal, id) {
         let password = userForm.find('#password').val().trim();
         let email = userForm.find('#email').val().trim();
         let roleArrayIds = userForm.find('#roles').val();
-        let roleArrayJsonIds = roleArrayIds.map(function (id) {
-            return {id: id};
-        });
+        let roleArrayJsonIds = roleArrayIds.map(id => ({id: id}));
         let data = {
             id: id,
             nickname: nickname,
@@ -247,12 +241,6 @@ const http = {
 const userService = {
     findAll: async () => {
         return await http.fetch('/api/v1/users');
-    },
-    add: async (data) => {
-        return await http.fetch('/api/v1/users/create', {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
     },
     findById: async (id) => {
         return await http.fetch('/api/v1/users/' + id);
